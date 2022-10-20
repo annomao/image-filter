@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response}from 'express';
 import bodyParser from 'body-parser';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
@@ -12,6 +12,24 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   
   // Use the body parser middleware for post requests
   app.use(bodyParser.json());
+
+  app.get('/filteredimage',async (req: Request, res:Response) => {
+    const { image_url } = req.query;
+    const filePaths: string[] = [];
+    if (!image_url){
+      return res.status(400).send("Image url is required")
+    }
+
+    const filteredPath = await filterImageFromURL(image_url);
+    res.sendFile(filteredPath);
+    
+    res.on('finish',()=>{
+      filePaths.push(filteredPath);
+      deleteLocalFiles(filePaths);
+    })
+    
+
+  })
 
   // @TODO1 IMPLEMENT A RESTFUL ENDPOINT
   // GET /filteredimage?image_url={{URL}}
