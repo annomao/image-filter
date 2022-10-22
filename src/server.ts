@@ -14,15 +14,15 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   app.use(bodyParser.json());
 
   app.get('/filteredimage',async (req: Request, res:Response) => {
-    const { image_url } = req.query;
+    const { image_url }: any = req.query;
     const filePaths: string[] = [];
     if (!image_url){
       return res.status(400).send("Image url is required")
     }
 
-    const filteredPath = await filterImageFromURL(image_url);
-    res.sendFile(filteredPath);
-    
+    const filteredPath: string = await filterImageFromURL(image_url);
+    res.status(200).sendFile(filteredPath);
+
     res.on('finish',()=>{
       filePaths.push(filteredPath);
       deleteLocalFiles(filePaths);
